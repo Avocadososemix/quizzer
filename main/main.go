@@ -17,7 +17,7 @@ type Problem struct {
 	answer   string
 }
 
-func main() {
+func readCSV() []Problem {
 	csvFile, err := os.Open("data/problems.csv")
 	check(err)
 
@@ -36,9 +36,15 @@ func main() {
 			answer:   line[1],
 		})
 	}
-	reader2 := bufio.NewReader(os.Stdin)
+	return problems
+}
 
+func main() {
+
+	var problems = readCSV()
 	var correctCount, questionCount Counter = new(counter8), new(counter8)
+	reader := bufio.NewReader(os.Stdin)
+
 	timeLimit := time.Duration(30)
 	fmt.Printf("Starting quiz. Stop by typing x. Time limit is %d seconds.\n", timeLimit)
 	timer := time.NewTimer(time.Second * timeLimit)
@@ -51,8 +57,7 @@ func main() {
 
 	for i :=0;i<100 ;i++  {
 		fmt.Printf("What is the answer to: %s\n", problems[i].Question())
-		check(err)
-		text, _ := reader2.ReadString('\n')
+		text, _ := reader.ReadString('\n')
 		if strings.TrimSpace(text) == "x" {
 			fmt.Println("Quitting.")
 		break
