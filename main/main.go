@@ -36,36 +36,36 @@ func main() {
 			answer:   line[1],
 		})
 	}
-
 	reader2 := bufio.NewReader(os.Stdin)
 
-	var counter, questionCount Counter
-	counter = new(counter8)
-	questionCount = new(counter8)
-	fmt.Println("Starting quiz. Stop by typing x. Time limit is 30 seconds.")
-	timer := time.NewTimer(5 * time.Second)
+	var correctCount, questionCount Counter = new(counter8), new(counter8)
+	timeLimit := time.Duration(30)
+	fmt.Printf("Starting quiz. Stop by typing x. Time limit is %d seconds.\n", timeLimit)
+	timer := time.NewTimer(time.Second * timeLimit)
 	defer timer.Stop()
 	go func() {
 		<-timer.C
-		fmt.Printf("Time's up! Correct answers: %s, total questions answered: %s \n", counter.Value(), questionCount.Value() )
+		fmt.Printf("Time's up! Correct answers: %s, total questions answered: %s\n", correctCount.Value(), questionCount.Value() )
+		os.Exit(0)
 	}()
 
-	for i :=0;i<10 ;i++  {
-		fmt.Println("What is the answer to: " + problems[i].Question())
+	for i :=0;i<100 ;i++  {
+		fmt.Printf("What is the answer to: %s\n", problems[i].Question())
+		check(err)
 		text, _ := reader2.ReadString('\n')
 		if strings.TrimSpace(text) == "x" {
 			fmt.Println("Quitting.")
 		break
 		} else if (strings.TrimSpace(text) == problems[i].Answer()) {
 			fmt.Println("That's correct!")
-			counter.Inc()
+			correctCount.Inc()
 			questionCount.Inc()
 		} else {
 			questionCount.Inc()
-			fmt.Println("Sorry, the correct answer is: " + problems[i].Answer())
+			fmt.Printf("Sorry, the correct answer is: %s\n", problems[i].Answer())
 		}
 	}
-	fmt.Printf("Correct answers: %s, total questions answered: %s \n", counter.Value(), questionCount.Value() )
+	fmt.Printf("Correct answers: %s, total questions answered: %s\n", correctCount.Value(), questionCount.Value() )
 }
 
 func (f *Problem) Question() string {
